@@ -27,27 +27,18 @@ const knex = require('knex')(
 
 const express = require('express')
 const bodyParser = require("express")
-const res = require('express/lib/response')
 const app = express()
 app.use(express.json())
 app.use(require('cors')())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-//todo 非同期とかわからんからとりあえず直列で
 app.get('*', (request, response) => {
     response.set({ 'Access-Control-Allow-Origin': '*' })
     knex('posts')
         .select('*')
         .where('parent_path', decodeURI(request.params[0]))
         .orWhere('current_path', decodeURI(request.params[0]))
-            .then(posts => {
-                const parentPosts = []
-                const currentPosts = []
-                const childPosts = [[]]
-                
-                
-                response.json(posts)
-            })
+            .then(posts => response.json(posts))
             .catch(error => {
                 response.json([])
                 console.log(error)
